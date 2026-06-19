@@ -249,10 +249,14 @@ func runCmd(cfgPath *string) *cobra.Command {
 				}
 
 				if err := sub.Submit(job, pkg); err != nil {
-					fmt.Printf("submit error for %s: %v\n", job.Title, err)
+					fmt.Printf("submit failed for %s: %v\n", job.Title, err)
+					if dbErr := db.UpdateStatus(job.ID, "failed"); dbErr != nil {
+						fmt.Printf("db error: %v\n", dbErr)
+					}
 					continue
 				}
 
+				fmt.Printf("applied: %s at %s\n", job.Title, job.Company)
 				if err := db.UpdateStatus(job.ID, "applied"); err != nil {
 					return err
 				}
@@ -270,9 +274,11 @@ func runCmd(cfgPath *string) *cobra.Command {
 }
 
 func listCmd() *cobra.Command {
-	return &cobra.Command{
+	var status string
+
+	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "List pending jobs in the database",
+		Short: "List jobs in the database",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			db, err := store.New("scout.db")
 			if err != nil {
@@ -280,23 +286,26 @@ func listCmd() *cobra.Command {
 			}
 			defer db.Close()
 
-			jobs, err := db.Pending()
+			jobs, err := db.ByStatus(status)
 			if err != nil {
 				return err
 			}
 
 			if len(jobs) == 0 {
-				fmt.Println("no pending jobs")
+				fmt.Printf("no %s jobs\n", status)
 				return nil
 			}
 
 			for _, j := range jobs {
-				fmt.Printf("[%d] %s at %s\n  %s\n  %s\n\n", j.Score, j.Title, j.Company, j.Location, j.URL)
+				fmt.Printf("[%s] [%d] %s at %s\n  %s\n  %s\n\n", j.Status, j.Score, j.Title, j.Company, j.Location, j.URL)
 			}
 
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&status, "status", "s", "pending", "filter by status: pending, applied, failed, skipped, all")
+	return cmd
 }
 
 func applyCmd() *cobra.Command {

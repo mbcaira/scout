@@ -92,7 +92,17 @@ func (s *Store) Get(id string) (Job, error) {
 }
 
 func (s *Store) Pending() ([]Job, error) {
-	rows, err := s.db.Query(`SELECT id, company, title, url, description, location, score, status, seen_at FROM jobs WHERE status = 'pending'`)
+	return s.ByStatus("pending")
+}
+
+func (s *Store) ByStatus(status string) ([]Job, error) {
+	var rows *sql.Rows
+	var err error
+	if status == "all" {
+		rows, err = s.db.Query(`SELECT id, company, title, url, description, location, score, status, seen_at FROM jobs ORDER BY seen_at DESC`)
+	} else {
+		rows, err = s.db.Query(`SELECT id, company, title, url, description, location, score, status, seen_at FROM jobs WHERE status = ? ORDER BY seen_at DESC`, status)
+	}
 	if err != nil {
 		return nil, err
 	}

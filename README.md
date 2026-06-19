@@ -1,4 +1,16 @@
-# scout
+```
+      ___           ___           ___           ___                   
+     /\__\         /\__\         /\  \         /\  \                  
+    /:/ _/_       /:/  /        /::\  \        \:\  \         ___     
+   /:/ /\  \     /:/  /        /:/\:\  \        \:\  \       /\__\    
+  /:/ /::\  \   /:/  /  ___   /:/  \:\  \   ___  \:\  \     /:/  /    
+ /:/_/:/\:\__\ /:/__/  /\__\ /:/__/ \:\__\ /\  \  \:\__\   /:/__/     
+ \:\/:/ /:/  / \:\  \ /:/  / \:\  \ /:/  / \:\  \ /:/  /  /::\  \     
+  \::/ /:/  /   \:\  /:/  /   \:\  /:/  /   \:\  /:/  /  /:/\:\  \    
+   \/_/:/  /     \:\/:/  /     \:\/:/  /     \:\/:/  /   \/__\:\  \   
+     /:/  /       \::/  /       \::/  /       \::/  /         \:\__\  
+     \/__/         \/__/         \/__/         \/__/           \/__/  
+```
 
 Automated job application pipeline. Scrapes careers pages, scores postings against your profile using Claude, generates tailored cover letters, and auto-submits Greenhouse applications — all unattended.
 

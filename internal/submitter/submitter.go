@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
 	"github.com/go-rod/rod/lib/launcher"
@@ -237,10 +238,53 @@ func (s *Submitter) submit(page *rod.Page) error {
 			return err
 		}
 		_ = page.Keyboard.Press(input.Enter)
-		return page.WaitIdle(30 * time.Second)
+		if err := page.WaitIdle(30 * time.Second); err != nil {
+			return fmt.Errorf("timeout after submit: %w", err)
+		}
+		return s.verifyConfirmation(page)
 	}
 
 	return fmt.Errorf("submit button not found")
+}
+
+func (s *Submitter) verifyConfirmation(page *rod.Page) error {
+	// Check URL for confirmation path segments
+	info, err := page.Info()
+	if err == nil {
+		u := strings.ToLower(info.URL)
+		for _, pat := range []string{"/confirmation", "/thank", "/success", "/applied"} {
+			if strings.Contains(u, pat) {
+				return nil
+			}
+		}
+	}
+
+	// Fall back to page text
+	html, err := page.HTML()
+	if err != nil {
+		return fmt.Errorf("submission unverified: could not read page: %w", err)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		return fmt.Errorf("submission unverified: could not parse page: %w", err)
+	}
+
+	text := strings.ToLower(doc.Find("body").Text())
+	for _, phrase := range []string{
+		"thank you for applying",
+		"application submitted",
+		"application received",
+		"received your application",
+		"successfully submitted",
+		"we'll be in touch",
+	} {
+		if strings.Contains(text, phrase) {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("submission unverified: no confirmation detected on page after submit")
 }
 
 func writeTempCoverLetter(text string) (string, error) {
