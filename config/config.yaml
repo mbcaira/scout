@@ -1,0 +1,30 @@
+email:
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+
+targets:
+  - name: "Cloudflare"
+    careers_url: "https://job-boards.greenhouse.io/cloudflare"
+    keywords: ["rust", "networking", "systems", "distributed"]
+    ats: "greenhouse"
+    auto_apply: true
+  - name: "Tailscale"
+    careers_url: "https://job-boards.greenhouse.io/tailscale"
+    keywords: ["rust", "networking", "dataplane", "systems"]
+    ats: "greenhouse"
+    auto_apply: true
+  - name: "Jane Street"
+    careers_url: "https://www.janestreet.com/join-jane-street/open-roles/"
+    keywords: ["low-latency", "systems", "infrastructure"]
+    ats: "custom"
+    auto_apply: false
+  - name: "Hudson River Trading"
+    careers_url: "https://www.hudsonrivertrading.com/careers/"
+    keywords: ["systems", "c++", "low-latency", "infrastructure"]
+    ats: "custom"
+    auto_apply: false
+
+filters:
+  min_salary_usd: 180000
+  exclude_keywords: ["javascript", "typescript", "frontend", "react", "angular"]
+  locations: ["Toronto", "New York", "NYC", "Remote"]
